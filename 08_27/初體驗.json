@@ -25,9 +25,34 @@
       ],
       "id": "fda76bd0-a7f0-42d8-bdc6-736eabecf466",
       "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "getAllPeople"
+      },
+      "type": "n8n-nodes-base.n8nTrainingCustomerDatastore",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -272
+      ],
+      "id": "c973de65-1fa8-4ca7-a8b5-3fcb419867ac",
+      "name": "Customer Datastore (n8n training)"
     }
   ],
-  "connections": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Customer Datastore (n8n training)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "pinData": {},
   "meta": {
     "instanceId": "d135f5bcfa8bdece905b6d778df94a7be68624c12d1878e14ba64eeb17a04d82"
