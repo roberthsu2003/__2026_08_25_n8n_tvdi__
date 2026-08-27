@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 初體驗\n- 項目1\n- 項目2\n\n## 數字項目\n1. 項目1\n2. 項目2\n\n這是第1行\n\n這是第2行\n",
+        "height": 352,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -992,
+        -416
+      ],
+      "typeVersion": 1,
+      "id": "28dac6fe-76b5-4158-99a5-8f2ba82bb158",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -272
+      ],
+      "id": "fda76bd0-a7f0-42d8-bdc6-736eabecf466",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {},
+  "pinData": {},
+  "meta": {
+    "instanceId": "d135f5bcfa8bdece905b6d778df94a7be68624c12d1878e14ba64eeb17a04d82"
+  }
+}
