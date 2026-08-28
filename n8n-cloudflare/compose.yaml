@@ -1,0 +1,32 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=${DOMAIN}
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      - N8N_EDITOR_BASE_URL=https://${DOMAIN}
+      - WEBHOOK_URL=https://${DOMAIN}
+      - GENERIC_TIMEZONE=Asia/Taipei
+      - TZ=Asia/Taipei
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    network_mode: host
+    depends_on:
+      - n8n
+
+volumes:
+  n8n_data:
+    name: n8n_data
