@@ -25,9 +25,92 @@
       ],
       "id": "fda76bd0-a7f0-42d8-bdc6-736eabecf466",
       "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97475086-e58f-4a72-aa10-e1619773c200",
+              "name": "編號",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "586ebf71-6568-4be7-a75e-e75e395e3e8c",
+              "name": "姓名",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "badd6475-6a64-4c79-936b-d1829dab5379",
+              "name": "郵件",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "ec220736-0a8e-461b-9514-081b862d0ebf",
+              "name": "註解",
+              "value": "={{ $json.notes }}",
+              "type": "string"
+            },
+            {
+              "id": "c95b26a5-814d-4a35-bf62-9790b91b8b09",
+              "name": "國家",
+              "value": "={{ $json.country }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -192,
+        -272
+      ],
+      "id": "64c61568-e584-43cb-9f58-f5e4ea04a4c5",
+      "name": "改為中文欄位,欄位改為5欄"
+    },
+    {
+      "parameters": {
+        "operation": "getAllPeople"
+      },
+      "type": "n8n-nodes-base.n8nTrainingCustomerDatastore",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -272
+      ],
+      "id": "c973de65-1fa8-4ca7-a8b5-3fcb419867ac",
+      "name": "內建輸出5筆資料"
     }
   ],
-  "connections": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "內建輸出5筆資料",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "內建輸出5筆資料": {
+      "main": [
+        [
+          {
+            "node": "改為中文欄位,欄位改為5欄",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "pinData": {},
   "meta": {
     "instanceId": "d135f5bcfa8bdece905b6d778df94a7be68624c12d1878e14ba64eeb17a04d82"
