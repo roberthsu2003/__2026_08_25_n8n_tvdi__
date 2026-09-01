@@ -51,6 +51,35 @@
       ],
       "typeVersion": 3.4,
       "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ce7886c-0305-4abe-a272-c39509a2e56b",
+              "name": "json_example_整數",
+              "value": 10,
+              "type": "number"
+            },
+            {
+              "id": "dc29a4b8-aaec-4268-8e3f-9fecf09a7046",
+              "name": "json_example_浮點數",
+              "value": 12.5,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        976,
+        576
+      ],
+      "id": "fadf79d7-21ab-4f7f-809b-3a403ae59bea",
+      "name": "Edit Fields"
     }
   ],
   "connections": {
@@ -67,7 +96,13 @@
     },
     "Key & Value": {
       "main": [
-        []
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
