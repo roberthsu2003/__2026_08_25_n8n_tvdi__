@@ -1,0 +1,102 @@
+{
+  "name": "取得網站引言",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "2ff1983f-1ba4-45ba-868c-b386ee80968a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://zenquotes.io/api/random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "4b2e6b24-fadc-4226-b2e4-d2b0e37a5405",
+      "name": "連結名言網站"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09f90ef3-1642-4713-a0bb-29b86832e291",
+              "name": "名言",
+              "value": "={{ $json.q }}",
+              "type": "string"
+            },
+            {
+              "id": "c560bf9a-f615-4aca-a58e-36c226e3b578",
+              "name": "作者",
+              "value": "={{ $json.a }}",
+              "type": "string"
+            },
+            {
+              "id": "5b4d1635-eff3-4f7c-b592-c4cfb696d939",
+              "name": "網頁",
+              "value": "={{ $json.h }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        176,
+        0
+      ],
+      "id": "b4ed6b66-3730-4e80-a933-4683d8d34d64",
+      "name": "欄位改為中文"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "連結名言網站",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "連結名言網站": {
+      "main": [
+        [
+          {
+            "node": "欄位改為中文",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "951f3e07-d2ce-47e6-9923-b632d84c526d",
+  "meta": {
+    "instanceId": "d135f5bcfa8bdece905b6d778df94a7be68624c12d1878e14ba64eeb17a04d82"
+  },
+  "nodeGroups": [],
+  "id": "JV5CxyUwLpXJvnVe",
+  "tags": []
+}
