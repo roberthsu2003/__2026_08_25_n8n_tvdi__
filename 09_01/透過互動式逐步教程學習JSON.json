@@ -57,6 +57,35 @@
         "assignments": {
           "assignments": [
             {
+              "id": "26f69003-0907-481b-93a6-fffe225c5af9",
+              "name": "布林欄位1",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "9095870c-54bc-4ea9-9737-e81e3148ca66",
+              "name": "布林欄位2",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1616,
+        592
+      ],
+      "id": "2a51c2fc-d344-45b0-b635-3d2da29d0734",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
               "id": "3ce7886c-0305-4abe-a272-c39509a2e56b",
               "name": "json_example_整數",
               "value": 10,
@@ -79,23 +108,17 @@
         576
       ],
       "id": "fadf79d7-21ab-4f7f-809b-3a403ae59bea",
-      "name": "Edit Fields"
+      "name": "整數數值"
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
             {
-              "id": "26f69003-0907-481b-93a6-fffe225c5af9",
-              "name": "布林欄位1",
-              "value": false,
-              "type": "boolean"
-            },
-            {
-              "id": "9095870c-54bc-4ea9-9737-e81e3148ca66",
-              "name": "布林欄位2",
-              "value": true,
-              "type": "boolean"
+              "id": "d1cd4513-baae-4f81-91fb-e4fa3a76728b",
+              "name": "加總",
+              "value": "={{ $json['json_example_整數'] + $json['json_example_浮點數']}}",
+              "type": "number"
             }
           ]
         },
@@ -104,11 +127,34 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        1152,
-        576
+        1200,
+        496
       ],
-      "id": "2a51c2fc-d344-45b0-b635-3d2da29d0734",
-      "name": "Edit Fields1"
+      "id": "895cc2d5-467b-4eea-a11b-af9813f08b57",
+      "name": "運算"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ccc3207c-f4c2-4363-b264-45b3110de8be",
+              "name": "平均",
+              "value": "={{\n($json['json_example_整數'] + $json['json_example_浮點數']) / 2\n}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1200,
+        656
+      ],
+      "id": "92821e52-7c22-44a7-b165-fdb86af06ee2",
+      "name": "運算1"
     }
   ],
   "connections": {
@@ -127,22 +173,32 @@
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "整數數值",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Edit Fields": {
+    "整數數值": {
       "main": [
         [
           {
-            "node": "Edit Fields1",
+            "node": "運算1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "運算",
             "type": "main",
             "index": 0
           }
         ]
+      ]
+    },
+    "運算1": {
+      "main": [
+        []
       ]
     }
   },
