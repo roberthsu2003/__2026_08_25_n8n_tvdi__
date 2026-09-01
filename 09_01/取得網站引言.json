@@ -1,5 +1,4 @@
 {
-  "name": "取得網站引言",
   "nodes": [
     {
       "parameters": {},
@@ -60,9 +59,96 @@
       ],
       "id": "b4ed6b66-3730-4e80-a933-4683d8d34d64",
       "name": "欄位改為中文"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-e5f6-47a8-9012-abcdef123456",
+              "name": "名言",
+              "type": "string",
+              "value": "={{ $('欄位改為中文').item.json.名言 }}"
+            },
+            {
+              "id": "b2c3d4e5-f6a7-48b9-0123-bcdefa234567",
+              "name": "口語化中文",
+              "type": "string",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "id": "c3d4e5f6-a7b8-49c0-1234-cdefab345678",
+              "name": "作者",
+              "type": "string",
+              "value": "={{ $('欄位改為中文').item.json.作者 }}"
+            },
+            {
+              "id": "d4e5f6a7-b8c9-40d1-2345-defabc456789",
+              "name": "網頁",
+              "type": "string",
+              "value": "={{ $('欄位改為中文').item.json.網頁 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "47f792e9-fbcc-4687-a4eb-736c62a3891a",
+      "name": "整理最終結果",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        688,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=請將以下這句英文名言，翻譯成自然流暢、口語化的繁體中文：\n\n{{ $json['名言'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "你是一位資深的台灣中文編輯與翻譯專家，擅長將英文名言轉換成道地、口語化、貼近台灣人日常用語的繁體中文。翻譯時請掌握原文的意涵、語氣與情感，避免生硬的逐字直譯，也不要自行增添原文沒有的意思。只輸出翻譯後的繁體中文句子本身，不要加上「翻譯：」之類的前綴，也不要附加任何說明或解釋。"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        384,
+        -288
+      ],
+      "id": "58cafeb1-74f2-4948-b6c3-f9ce204a4944",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "nvidia/nemotron-3-super-120b-a12b:free",
+          "mode": "id"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        -144
+      ],
+      "id": "a5b26a37-a53b-4ffc-af2a-0adb10c882a9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lUmweMogi5GUYPfT",
+          "name": "OpenAI"
+        }
+      }
     }
   ],
-  "pinData": {},
   "connections": {
     "When clicking ‘Execute workflow’": {
       "main": [
@@ -85,18 +171,46 @@
           }
         ]
       ]
+    },
+    "欄位改為中文": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "整理最終結果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
-  "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate"
-  },
-  "versionId": "951f3e07-d2ce-47e6-9923-b632d84c526d",
+  "pinData": {},
   "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true,
     "instanceId": "d135f5bcfa8bdece905b6d778df94a7be68624c12d1878e14ba64eeb17a04d82"
-  },
-  "nodeGroups": [],
-  "id": "JV5CxyUwLpXJvnVe",
-  "tags": []
+  }
 }
