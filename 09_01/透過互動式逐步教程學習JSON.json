@@ -80,6 +80,35 @@
       ],
       "id": "fadf79d7-21ab-4f7f-809b-3a403ae59bea",
       "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26f69003-0907-481b-93a6-fffe225c5af9",
+              "name": "布林欄位1",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "9095870c-54bc-4ea9-9737-e81e3148ca66",
+              "name": "布林欄位2",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1152,
+        576
+      ],
+      "id": "2a51c2fc-d344-45b0-b635-3d2da29d0734",
+      "name": "Edit Fields1"
     }
   ],
   "connections": {
@@ -99,6 +128,17 @@
         [
           {
             "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
             "type": "main",
             "index": 0
           }
