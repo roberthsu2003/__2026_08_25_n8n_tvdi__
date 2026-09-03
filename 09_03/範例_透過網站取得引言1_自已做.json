@@ -1,0 +1,292 @@
+{
+  "name": "範例_透過網站取得引言1_自已做",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -32
+      ],
+      "id": "445b42b0-ee77-4629-9d0b-1c4834d2e20f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://zenquotes.io/api/random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -32,
+        -32
+      ],
+      "id": "ffe411e1-195f-4a40-8c8e-50c359ec84ab",
+      "name": "去名言網站_下載名言"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5abaeb42-ca7a-4957-8866-9212875ef587",
+              "name": "名言",
+              "value": "={{ $json['q'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b5df6e05-6d7d-40f8-ae4e-5a73f547db4d",
+              "name": "作者",
+              "value": "={{ $json.a }}",
+              "type": "string"
+            },
+            {
+              "id": "a2cf8cd7-b39f-4e68-b409-4440c4f8b3e2",
+              "name": "網頁",
+              "value": "={{ $json.h }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        192,
+        -32
+      ],
+      "id": "87196c65-640a-4a45-a215-8e4d4bc6e511",
+      "name": "欄位改為中文"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4590a8e9-b9b5-4da4-8098-f5dd0b0ecc37",
+              "name": "名言(原文)",
+              "value": "={{ $('欄位改為中文').item.json['名言'] }}",
+              "type": "string"
+            },
+            {
+              "id": "91efce1e-6702-411d-ab9c-38d25368402f",
+              "name": "作者(原文)",
+              "value": "={{ $('欄位改為中文').item.json['作者'] }}",
+              "type": "string"
+            },
+            {
+              "id": "cb05803c-15c8-47fa-be10-06f69b124485",
+              "name": "翻譯成中文",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        752,
+        -32
+      ],
+      "id": "1893b32a-99a4-43e8-9ec0-3e48fb08d4eb",
+      "name": "翻譯完的內容"
+    },
+    {
+      "parameters": {
+        "path": "random-quote",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        176
+      ],
+      "id": "9cbe2ce9-40f6-412e-b964-fef6643054ce",
+      "name": "Webhook",
+      "webhookId": "1eb012ef-0ce6-4e0a-8973-1082b698139f"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d=$input.all()[0]?.json||{};\nconst esc=v=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\"','&quot;');\nconst o=esc(d['名言(原文)']||d['名言']||'');\nconst a=esc(d['作者(原文)']||d['作者']||'');\nconst t=esc(d['翻譯成中文']||'');\nconst html='<!doctype html><html lang=\"zh-Hant\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>DAILY QUOTE · 每日名言</title><style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,\"Noto Sans TC\",\"Microsoft JhengHei\",sans-serif;background:linear-gradient(135deg,#eef2ff,#f8fafc);color:#172033;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}.card{width:min(860px,100%);background:rgba(255,255,255,.94);border:1px solid #e5e7eb;border-radius:28px;padding:42px;box-shadow:0 20px 60px rgba(15,23,42,.12)}.eyebrow{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#6366f1;font-weight:700;margin-bottom:30px}.label{font-size:14px;color:#64748b;font-weight:700;margin-bottom:10px}.quote{font-size:clamp(22px,3.5vw,32px);line-height:1.65;font-weight:650;margin:0}.en{font-size:18px;line-height:1.7;color:#475569;margin:12px 0 0}.author{margin-top:26px;font-weight:700;color:#334155}.divider{height:1px;background:#e5e7eb;margin:30px 0}.footer{font-size:13px;color:#94a3b8;text-align:center;margin-top:28px}.btn{display:inline-block;margin-top:28px;padding:12px 18px;border-radius:12px;background:#4f46e5;color:#fff;text-decoration:none;font-weight:700}</style></head><body><main class=\"card\"><div class=\"eyebrow\">DAILY QUOTE · 每日名言</div><section><div class=\"label\">繁體中文 · Traditional Chinese</div><p class=\"quote\">'+t+'</p></section><div class=\"divider\"></div><section><div class=\"label\">英文原文 · English Original</div><p class=\"en\">“'+o+'”</p><div class=\"author\">— '+a+'</div></section><a class=\"btn\" href=\"/webhook/random-quote\">重新取得名言 · New Quote</a><div class=\"footer\">Powered by n8n · AI Translation</div></main></body></html>';\nreturn [{json:{html}}];"
+      },
+      "id": "2f36fb4f-ed55-4697-8307-09076c68a3e4",
+      "name": "產生美觀網頁",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1152,
+        -32
+      ],
+      "id": "da1a16b0-dbc0-4d7a-ba63-6f7b34db7587",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=請將以下英文名言與作者翻譯成繁體中文，只回傳翻譯結果，格式為:\n名言: <翻譯後的名言>\n作者: <翻譯後的作者>\n\n名言: {{ $json.名言 }}\n作者: {{ $json.作者 }}\n\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        416,
+        -32
+      ],
+      "id": "db64e08d-1d4e-459d-821d-9bd3dd1021c7",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3.7-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        352,
+        176
+      ],
+      "id": "a77ffd12-09fa-47ed-b2d7-37e3143b4a73",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "hDnmlBEBtds0DZ9I",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "去名言網站_下載名言",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "去名言網站_下載名言": {
+      "main": [
+        [
+          {
+            "node": "欄位改為中文",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "欄位改為中文": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "去名言網站_下載名言",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "翻譯完的內容": {
+      "main": [
+        [
+          {
+            "node": "產生美觀網頁",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "產生美觀網頁": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "翻譯完的內容",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fef821ee-2e75-4d94-bc6e-2be349859884",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c803ca8a26bf45bc3f88f1f78c91d96677081380780467fcefe6b6050eab3548"
+  },
+  "nodeGroups": [],
+  "id": "XT7l9uQDIGe4aY3t",
+  "tags": []
+}
