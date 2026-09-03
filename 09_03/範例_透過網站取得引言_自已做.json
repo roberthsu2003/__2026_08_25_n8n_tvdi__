@@ -1,0 +1,197 @@
+{
+  "name": "範例_透過網站取得引言_自已做",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -32
+      ],
+      "id": "76ba43f9-45df-4222-888f-ac9fa81a356f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://zenquotes.io/api/random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -32,
+        -32
+      ],
+      "id": "4c1c3131-eebe-4217-8299-4463f5ce4954",
+      "name": "去名言網站_下載名言"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5abaeb42-ca7a-4957-8866-9212875ef587",
+              "name": "名言",
+              "value": "={{ $json['q'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b5df6e05-6d7d-40f8-ae4e-5a73f547db4d",
+              "name": "作者",
+              "value": "={{ $json.a }}",
+              "type": "string"
+            },
+            {
+              "id": "a2cf8cd7-b39f-4e68-b409-4440c4f8b3e2",
+              "name": "網頁",
+              "value": "={{ $json.h }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        192,
+        -32
+      ],
+      "id": "67470a58-d070-487e-9d4f-dec11322b00e",
+      "name": "欄位改為中文"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "google/gemini-3.7-flash",
+          "mode": "id"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=請將以下英文名言與作者翻譯成繁體中文，只回傳翻譯結果，格式為:\n名言: <翻譯後的名言>\n作者: <翻譯後的作者>\n\n名言: {{ $json.名言 }}\n作者: {{ $json.作者 }}\n\n"
+            },
+            {
+              "role": "system",
+              "content": "輸出的格式,名言和作者要各自有一個欄位"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "store": false
+        }
+      },
+      "id": "8be81e31-cb4d-4abc-a71a-00e4435761ff",
+      "name": "翻譯成中文",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        -32
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "j2MKKBd6kOuJMmUo",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4590a8e9-b9b5-4da4-8098-f5dd0b0ecc37",
+              "name": "名言(原文)",
+              "value": "={{ $('欄位改為中文').item.json['名言'] }}",
+              "type": "string"
+            },
+            {
+              "id": "91efce1e-6702-411d-ab9c-38d25368402f",
+              "name": "作者(原文)",
+              "value": "={{ $('欄位改為中文').item.json['作者'] }}",
+              "type": "string"
+            },
+            {
+              "id": "cb05803c-15c8-47fa-be10-06f69b124485",
+              "name": "翻譯成中文",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        752,
+        -32
+      ],
+      "id": "b166108b-38c5-416e-8cc4-cc7d5053f220",
+      "name": "翻譯完的內容"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "去名言網站_下載名言",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "去名言網站_下載名言": {
+      "main": [
+        [
+          {
+            "node": "欄位改為中文",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "欄位改為中文": {
+      "main": [
+        [
+          {
+            "node": "翻譯成中文",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "翻譯成中文": {
+      "main": [
+        [
+          {
+            "node": "翻譯完的內容",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "bfe9240b-41b2-4b4d-8a50-3d3b204407ea",
+  "meta": {
+    "instanceId": "c803ca8a26bf45bc3f88f1f78c91d96677081380780467fcefe6b6050eab3548"
+  },
+  "nodeGroups": [],
+  "id": "xu6Lsv5wms024yzs",
+  "tags": []
+}
