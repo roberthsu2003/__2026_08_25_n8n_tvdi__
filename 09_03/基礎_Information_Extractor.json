@@ -1,0 +1,190 @@
+{
+  "name": "基礎_Information_Extractor",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 基礎 2：Information Extractor\n學習如何從非結構化雜亂文字中，精準提取強型別 JSON 欄位（取代傳統複雜 Regex）。\n\n📌 支援模型：NVIDIA NIM / OpenRouter (OpenAI 相容)",
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "3da29a92-76a3-49d9-829e-2d839b3e98eb",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        224
+      ],
+      "id": "9dd79926-1b1d-4acb-86a5-2beaa06f99a7",
+      "name": "執行工作流 (Manual Trigger)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "field-1",
+              "name": "raw_message",
+              "value": "您好！我是王小明（聯絡電話：0912-345-678），請幫我將商品送到「台北市信義區信義路五段7號8樓」。\n我想訂購：阿里山高山茶 2 盒（單價 600 元），以及日月潭紅茶 1 盒（單價 450 元）。請幫我開立統編 88889999，謝謝！",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        224
+      ],
+      "id": "c6087014-e845-41d8-9417-f01e33e1dead",
+      "name": "模擬自然語言訂購留言"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.raw_message }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"customer_name\": { \"type\": \"string\", \"description\": \"顧客姓名\" },\n    \"phone\": { \"type\": \"string\", \"description\": \"聯絡電話\" },\n    \"shipping_address\": { \"type\": \"string\", \"description\": \"收件地址\" },\n    \"tax_id\": { \"type\": \"string\", \"description\": \"統一編號（若無則為空）\" },\n    \"order_items\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"item_name\": { \"type\": \"string\", \"description\": \"商品名稱\" },\n          \"quantity\": { \"type\": \"number\", \"description\": \"購買數量\" },\n          \"unit_price\": { \"type\": \"number\", \"description\": \"單價\" }\n        },\n        \"required\": [\"item_name\", \"quantity\"]\n      }\n    },\n    \"total_amount\": { \"type\": \"number\", \"description\": \"訂單預估總金額\" }\n  },\n  \"required\": [\"customer_name\", \"phone\", \"shipping_address\", \"order_items\"]\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "482dc36b-72b6-4162-88f7-e7774ef932ec",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3.7-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        464,
+        416
+      ],
+      "id": "271d744c-ad59-4565-b1f7-143354ccf5b9",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "hDnmlBEBtds0DZ9I",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5cd45bb6-1a95-4704-84dc-005394b80534",
+              "name": "客戶名稱",
+              "value": "={{ $json.output.customer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "dc654653-51ce-4711-96c2-52eb15ac3e16",
+              "name": "電話",
+              "value": "={{ $json.output.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "d857cbd5-66cb-4336-ab4c-9fbe44fad0d2",
+              "name": "送貨地址",
+              "value": "={{ $json.output.shipping_address }}",
+              "type": "string"
+            },
+            {
+              "id": "88e18d0a-e43f-4c4b-885c-8668385ae8c7",
+              "name": "訂購的商品",
+              "value": "={{ $json.output.order_items }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        848,
+        224
+      ],
+      "id": "04976a90-5ffe-4b44-82ca-f6512b721130",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "執行工作流 (Manual Trigger)": {
+      "main": [
+        [
+          {
+            "node": "模擬自然語言訂購留言",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "模擬自然語言訂購留言": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e558d87d-1b7f-44dd-bc70-fa84de45d52b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c803ca8a26bf45bc3f88f1f78c91d96677081380780467fcefe6b6050eab3548"
+  },
+  "nodeGroups": [],
+  "id": "sFtREhOgeRwipTYl",
+  "tags": []
+}
