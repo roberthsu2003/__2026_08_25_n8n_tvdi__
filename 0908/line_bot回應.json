@@ -34,16 +34,58 @@
     },
     {
       "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a82f2d6c-14ff-44d9-9a96-643325c377e7",
+              "name": "使用者的訊息",
+              "value": "={{ $json.body.events[0].message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "70367989-e0ea-4e3f-b087-2b6a26f9798a",
+              "name": "replyToken",
+              "value": "={{ $json.body.events[0].replyToken }}",
+              "type": "string"
+            }
+          ]
+        },
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
         144,
-        144
+        176
       ],
       "id": "85fb2733-4915-4949-a551-8e2c99476c1e",
       "name": "接收訊息"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $json.replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"這是從 n8n 自動回覆的訊息！\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        368,
+        176
+      ],
+      "id": "1595957e-f120-4882-8d92-465acc2d4b96",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FqutWVN69LyeeJnm",
+          "name": "line_tvdi_憑證"
+        }
+      }
     }
   ],
   "connections": {
@@ -62,9 +104,66 @@
           }
         ]
       ]
+    },
+    "接收訊息": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "pinData": {},
+  "pinData": {
+    "Webhook": [
+      {
+        "headers": {
+          "host": "superinnocent-hillary-unwholesome.ngrok-free.dev",
+          "user-agent": "LineBotWebhook/2.0",
+          "content-length": "815",
+          "content-type": "application/json; charset=utf-8",
+          "x-forwarded-for": "147.92.149.167",
+          "x-forwarded-host": "superinnocent-hillary-unwholesome.ngrok-free.dev",
+          "x-forwarded-proto": "https",
+          "x-line-signature": "ynfLLvi+bKBqa1v/ZsM2WtIXqxcc814TabXtkSJZDG0=",
+          "accept-encoding": "gzip"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "destination": "Ua74b5d1774a32f990a2d9f188a9b66af",
+          "events": [
+            {
+              "type": "message",
+              "message": {
+                "type": "text",
+                "id": "630837562756038725",
+                "quoteToken": "w3bmyaYJ7JL5ijPUR6gyhergLJXKTwfFOU20hpWSSDAJFDwliDCHHl-yikP0q4pjBkmafasR4thPsGImeaoKix2pWHPb5LCE4an9hQsZqH1TrbRJ5XjF7SRBZQe4LgwnKKgavbW0LDv7FHNQL2Hqaw",
+                "markAsReadToken": "8IUHSn6PDzYlAyhJI4jq6sF158GThfzrXLrARc8GwZrvY9c28OTHsph2SHyX48_JUeJpVqUx1sNOQ30UGbWlrIz3r-sz5EfTqKOVYlk4dn8wI1LGFjqwbH1n0W5cYLA_xVXVfc60bQgba4DpunXNCrnrX9N3gAp02od6t1sCh_4xCcjLtc7ETX2kFNEj7Fj9443Xjtt1JhpqYpb8LKnACg",
+                "text": "天空為什麼是藍的"
+              },
+              "webhookEventId": "01M1ZJJ48CN5WAGAH4WCPB1ZJZ",
+              "deliveryContext": {
+                "isRedelivery": false
+              },
+              "timestamp": 1788839792399,
+              "source": {
+                "type": "user",
+                "userId": "U4abab086d3a1637cd0832b5489bf5ace"
+              },
+              "replyToken": "d70139b316bc46f58a9f8b01eda7704c",
+              "mode": "active"
+            }
+          ]
+        },
+        "webhookUrl": "https://superinnocent-hillary-unwholesome.ngrok-free.dev/webhook/tvdi_line_bot",
+        "executionMode": "production"
+      }
+    ]
+  },
   "meta": {
     "instanceId": "c803ca8a26bf45bc3f88f1f78c91d96677081380780467fcefe6b6050eab3548"
   }
