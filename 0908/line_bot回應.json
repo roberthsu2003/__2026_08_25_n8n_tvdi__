@@ -1,0 +1,63 @@
+{
+  "name": "line_bot回應",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tvdi_line_bot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6ac5e50f-7382-4eda-82c5-6145d4fa2da1",
+      "name": "Webhook",
+      "webhookId": "817430c8-52d7-48c8-97b2-4ad7688944e6"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"ok\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "7075ab74-a596-42ef-8708-4a25b1055106",
+      "name": "回應line_連線是ok的"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "回應line_連線是ok的",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f6753608-0d01-48b3-a795-2798d3703be7",
+  "meta": {
+    "instanceId": "c803ca8a26bf45bc3f88f1f78c91d96677081380780467fcefe6b6050eab3548"
+  },
+  "nodeGroups": [],
+  "id": "GMUgXPlX4BbBdnCj",
+  "tags": []
+}
