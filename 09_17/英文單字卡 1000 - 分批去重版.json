@@ -1,0 +1,394 @@
+{
+  "name": "英文單字卡 1000 - 分批去重版",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const existing = new Set(\n  $('讀取已有單字').all().map((i) => {\n    const r = i.json?.row ?? i.json ?? {};\n    return String(r.word ?? '').trim().toLowerCase();\n  }).filter(Boolean)\n);\nconst seen = new Set();\nconst rows = [];\nlet totalParsed = 0, skippedExisting = 0, skippedDup = 0, skippedInvalid = 0;\nfor (const item of $input.all()) {\n  const j = item.json ?? {};\n  let raw = j.text ?? j.output ?? j.content ?? '';\n  if (typeof raw !== 'string') raw = JSON.stringify(j);\n  raw = String(raw).replace(/```json/gi, '').replace(/```/g, '').trim();\n  let arr;\n  try { arr = JSON.parse(raw); }\n  catch (e) {\n    const m = String(raw).match(/\\[[\\s\\S]*\\]/);\n    if (!m) { skippedInvalid++; continue; }\n    try { arr = JSON.parse(m[0]); } catch (e2) { skippedInvalid++; continue; }\n  }\n  if (!Array.isArray(arr)) { skippedInvalid++; continue; }\n  for (const w of arr) {\n    totalParsed++;\n    const word = String(w.word ?? '').trim();\n    const meaning_zh = String(w.meaning_zh ?? '').trim();\n    const pos = String(w.pos ?? '').trim();\n    const example_en = String(w.example_en ?? '').trim();\n    if (!/^[A-Za-z][A-Za-z'\\- ]{1,30}$/.test(word)) { skippedInvalid++; continue; }\n    if (!meaning_zh) { skippedInvalid++; continue; }\n    const key = word.toLowerCase();\n    if (existing.has(key)) { skippedExisting++; continue; }\n    if (seen.has(key)) { skippedDup++; continue; }\n    seen.add(key);\n    rows.push({ json: {\n      word,\n      meaning_zh,\n      extra: '',\n      pos,\n      progress: '不熟',\n      example_en,\n      tts_url: 'https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=' + encodeURIComponent(word)\n    }});\n  }\n}\nif (rows.length === 0) {\n  throw new Error('組裝單字卡：無可用新單字（解析:' + totalParsed + ' 已存在:' + skippedExisting + ' 批次內重複:' + skippedDup + ' 無效:' + skippedInvalid + '）。請檢查 Ollama 回傳是否為純 JSON 陣列。');\n}\nreturn rows;"
+      },
+      "id": "8da04b58-876a-4617-9b66-e9950da039d5",
+      "name": "組裝單字卡",
+      "position": [
+        928,
+        0
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "單字卡",
+          "cachedResultUrl": "/projects/rEj62SV7csk3F3D3/datatables/yQPOwmv10oBan0TW",
+          "mode": "list",
+          "value": "yQPOwmv10oBan0TW"
+        },
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "word",
+              "id": "word",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meaning_zh",
+              "id": "meaning_zh",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "extra",
+              "id": "extra",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "pos",
+              "id": "pos",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "progress",
+              "id": "progress",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "example_en",
+              "id": "example_en",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "tts_url",
+              "id": "tts_url",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "d7d2ca28-effd-4ffd-96f5-1616070eced3",
+      "name": "寫入 Data Table",
+      "position": [
+        1088,
+        0
+      ],
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "path": "vocab-cards",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0bc51ccb-c47b-4064-b26a-0d15fc9c183b",
+      "name": "單字卡網頁入口",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        416
+      ],
+      "webhookId": "941967ae-36e5-4cc1-8b65-544d0e6d9a72"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "單字卡",
+          "cachedResultUrl": "/projects/rEj62SV7csk3F3D3/datatables/yQPOwmv10oBan0TW",
+          "mode": "list",
+          "value": "yQPOwmv10oBan0TW"
+        },
+        "returnAll": true
+      },
+      "id": "966e338d-7782-4389-a70b-1b6fc0410643",
+      "name": "讀取單字",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        400
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map((i) => i.json?.row || i.json).filter((r) => r && String(r.word || '').trim());\nconst esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\nconst escAttr = (s) => esc(s).replace(/'/g, '&#39;');\n\nfunction posMeta(pos) {\n  const p = String(pos || '').trim();\n  if (p.includes('名')) return { ch: '名', cls: 'noun' };\n  if (p.includes('動')) return { ch: '動', cls: 'verb' };\n  if (p.includes('形')) return { ch: '形', cls: 'adj' };\n  if (p.includes('副')) return { ch: '副', cls: 'adv' };\n  if (p) return { ch: p.charAt(0), cls: 'other' };\n  return { ch: '詞', cls: 'other' };\n}\n\nconst cards = items.map((r) => {\n  const word = esc(r.word);\n  const key = escAttr(String(r.word ?? '').toLowerCase());\n  const meta = posMeta(r.pos);\n  const progress = esc(r.progress || '不熟');\n  return '<article class=\"card ' + meta.cls + '\" data-word=\"' + key + '\" data-meaning=\"' + escAttr(r.meaning_zh) + '\" data-progress=\"' + escAttr(r.progress || '不熟') + '\">' +\n    '<div class=\"card-head\"><h2>' + word + '</h2><span class=\"pos-badge\" title=\"' + esc(r.pos) + '\">' + esc(meta.ch) + '</span></div>' +\n    '<p class=\"meaning\">' + esc(r.meaning_zh) + (r.extra ? '<span class=\"extra\">（' + esc(r.extra) + '）</span>' : '') + '</p>' +\n    '<blockquote class=\"example\">' + esc(r.example_en) + '</blockquote>' +\n    '<div class=\"card-foot\">' +\n      '<audio class=\"player\" controls preload=\"none\" src=\"' + escAttr(r.tts_url) + '\"></audio>' +\n      '<div class=\"seg\">' +\n        '<button class=\"seg-btn know\" data-state=\"\\u5df2\\u6703\" onclick=\"mark(this,\\'' + key + '\\',\\'\\u5df2\\u6703\\')\">\\u5df2\\u6703</button>' +\n        '<button class=\"seg-btn review\" data-state=\"\\u4e0d\\u719f\" onclick=\"mark(this,\\'' + key + '\\',\\'\\u4e0d\\u719f\\')\">\\u4e0d\\u719f</button>' +\n      '</div>' +\n    '</div>' +\n  '</article>';\n}).join('\\n');\n\nconst html = '<!DOCTYPE html><html lang=\"zh-Hant\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">' +\n'<title>英文單字卡</title>' +\n'<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>' +\n'<link href=\"https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Sans+TC:wght@400;500;700&display=swap\" rel=\"stylesheet\">' +\n'<style>' +\n':root{--bg:#EFF2F0;--surface:#FFFFFF;--ink:#1B2430;--ink-soft:#5B6472;--line:#DEE3E1;--noun:#375D8C;--verb:#2E7D6B;--adj:#B4772B;--adv:#7B4B8A;--other:#6B7280;--know:#2E7D6B;--review:#C9553D;--focus:#375D8C;}' +\n'*{box-sizing:border-box}' +\n'body{margin:0;background:var(--bg);color:var(--ink);font-family:\"Noto Sans TC\",system-ui,sans-serif;line-height:1.5}' +\n'a,button,input{font-family:inherit}' +\n'.top{max-width:1100px;margin:0 auto;padding:32px 20px 12px}' +\n'.top h1{font-family:\"Fraunces\",serif;font-weight:600;font-size:2.1em;margin:0 0 6px;letter-spacing:.01em}' +\n'.stats{color:var(--ink-soft);font-size:.92em;margin:0}' +\n'.toolbar{position:sticky;top:0;z-index:5;background:rgba(239,242,240,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;gap:10px;max-width:1100px;margin:0 auto}' +\n'#q{flex:1;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-size:.95em}' +\n'#q:focus-visible{outline:2px solid var(--focus);outline-offset:1px}' +\n'.btn-primary{padding:10px 18px;border:none;border-radius:8px;background:var(--ink);color:#fff;font-size:.95em;cursor:pointer;white-space:nowrap}' +\n'.btn-primary:hover{background:#2c374a}' +\n'.btn-primary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}' +\n'.grid{max-width:1100px;margin:0 auto;padding:24px 20px 60px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}' +\n'.card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--other);border-radius:8px;padding:18px 20px;transition:box-shadow .5s ease}' +\n'.card.noun{border-left-color:var(--noun)}.card.verb{border-left-color:var(--verb)}.card.adj{border-left-color:var(--adj)}.card.adv{border-left-color:var(--adv)}' +\n'.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}' +\n'.card-head h2{font-family:\"Fraunces\",serif;font-weight:600;font-size:1.7em;margin:0;word-break:break-word}' +\n'.pos-badge{flex:none;width:26px;height:26px;border-radius:50%;background:var(--bg);color:var(--ink-soft);font-size:.8em;display:flex;align-items:center;justify-content:center}' +\n'.card.noun .pos-badge{color:var(--noun)}.card.verb .pos-badge{color:var(--verb)}.card.adj .pos-badge{color:var(--adj)}.card.adv .pos-badge{color:var(--adv)}' +\n'.meaning{margin:8px 0 12px;font-size:1.02em}' +\n'.extra{color:var(--ink-soft);font-size:.88em;margin-left:4px}' +\n'.example{margin:0 0 14px;padding-left:12px;border-left:2px solid var(--line);color:var(--ink-soft);font-family:\"Fraunces\",serif;font-style:italic;font-size:.98em}' +\n'.card-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}' +\n'.player{height:32px;flex:1;min-width:140px}' +\n'.seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;flex:none}' +\n'.seg-btn{border:none;background:var(--surface);color:var(--ink-soft);padding:7px 12px;font-size:.85em;cursor:pointer}' +\n'.seg-btn+.seg-btn{border-left:1px solid var(--line)}' +\n'.seg-btn.active.know{background:var(--know);color:#fff}' +\n'.seg-btn.active.review{background:var(--review);color:#fff}' +\n'.seg-btn:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}' +\n'.card:target,.card.flash{box-shadow:0 0 0 3px var(--focus)}' +\n'@media (prefers-reduced-motion:no-preference){.flash{animation:pulse 1.1s ease}}' +\n'@keyframes pulse{0%{box-shadow:0 0 0 0 var(--focus)}70%{box-shadow:0 0 0 8px rgba(55,93,140,0)}100%{box-shadow:0 0 0 0 rgba(55,93,140,0)}}' +\n'.empty{max-width:1100px;margin:40px auto;padding:0 20px;color:var(--ink-soft)}' +\n'</style></head><body>' +\n'<div class=\"top\"><h1>英文單字卡</h1><p class=\"stats\" id=\"stats\"></p></div>' +\n'<div class=\"toolbar\"><input id=\"q\" type=\"search\" placeholder=\"搜尋單字或中文意思\" oninput=\"doFilter()\"><button class=\"btn-primary\" onclick=\"doRandom()\">隨機抽卡</button></div>' +\n(items.length ? '<main id=\"list\" class=\"grid\">' + cards + '</main>' : '<p class=\"empty\">目前還沒有單字，請先執行產生單字的工作流。</p>') +\n'<script>' +\n'var prog=JSON.parse(localStorage.getItem(\\'vocabProg\\')||\\'{}\\');' +\n'function paint(){document.querySelectorAll(\\'.card\\').forEach(function(c){var w=c.dataset.word;var s=prog[w]||c.dataset.progress;setState(c,s);});updateStats();}' +\n'function setState(card,s){card.querySelectorAll(\\'.seg-btn\\').forEach(function(b){b.classList.toggle(\\'active\\',b.dataset.state===s);});}' +\n'function mark(btn,w,s){prog[w]=s;localStorage.setItem(\\'vocabProg\\',JSON.stringify(prog));setState(btn.closest(\\'.card\\'),s);updateStats();}' +\n'function updateStats(){var cards=document.querySelectorAll(\\'.card\\');var known=0;cards.forEach(function(c){if(c.querySelector(\\'.seg-btn.know\\').classList.contains(\\'active\\'))known++;});var total=cards.length;document.getElementById(\\'stats\\').textContent=total?(\\'\\u5171 \\'+total+\\' \\u5f35\\u00b7\\u5df2\\u6703 \\'+known+\\'\\u00b7\\u5f85\\u52a0\\u5f37 \\'+(total-known)):\\'\\';}' +\n'function doFilter(){var q=document.getElementById(\\'q\\').value.trim().toLowerCase();document.querySelectorAll(\\'#list .card\\').forEach(function(c){var m=!q||c.dataset.word.indexOf(q)>-1||c.dataset.meaning.toLowerCase().indexOf(q)>-1;c.style.display=m?\\'\\':\\'none\\';});}' +\n'function doRandom(){var cs=[].slice.call(document.querySelectorAll(\\'#list .card\\')).filter(function(c){return c.style.display!==\\'none\\';});if(!cs.length)return;document.querySelectorAll(\\'.card.flash\\').forEach(function(c){c.classList.remove(\\'flash\\')});var c=cs[Math.floor(Math.random()*cs.length)];c.classList.add(\\'flash\\');c.scrollIntoView({behavior:\\'smooth\\',block:\\'center\\'});}' +\n'paint();' +\n'</scr' + 'ipt></body></html>';\nreturn [{ json: { html } }];"
+      },
+      "id": "57ca8e24-7de0-4336-9cd7-d459088e2580",
+      "name": "組網頁 HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "f1c39824-0a3a-4ab6-9c0d-ba057eb27321",
+      "name": "回傳網頁",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        640,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "yQPOwmv10oBan0TW",
+          "mode": "list",
+          "cachedResultName": "單字卡",
+          "cachedResultUrl": "/projects/rEj62SV7csk3F3D3/datatables/yQPOwmv10oBan0TW"
+        },
+        "returnAll": true
+      },
+      "id": "0848c2b6-8b59-4f0c-bfdb-909d908aa22a",
+      "name": "讀取已有單字",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');\nconst topics = ['職場溝通','旅遊交通','餐飲美食','科技網路','健康醫療','教育學習','商業金融','環境氣候','運動休閒','文化藝術','政治法律','科學研究','家庭生活','購物消費','社交情感','日常時間','自然動物','城市生活','求職面試','商務書信','會議簡報','客服應對','天氣季節','興趣愛好'];\nconst seeds = [\n  ...letters.map((L) => ({ json: { hint: `以 ${L} 開頭的常用英文單字` } })),\n  ...topics.map((t) => ({ json: { hint: `主題「${t}」相關的常用英文單字` } })),\n];\nreturn seeds;"
+      },
+      "id": "cfa9ca0c-0e24-4c81-8097-533f02251105",
+      "name": "批次種子",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d0226366-1aa5-4f11-b89d-7610ba7130a3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=請產生 40 個「{{ ($json.hint || '日常常用').trim() }}」、適合台灣高中到多益程度的常用英文單字（不要 the/be 這類最常見字）。只輸出純 JSON 陣列，不要 markdown、不要解釋。每個元素格式：{\"word\": \"polish\", \"meaning_zh\": \"擦亮、改進\", \"pos\": \"動詞\", \"example_en\": \"You should polish your English speaking skills before going abroad.\"}。pos 請用繁體中文（名詞/動詞/形容詞/副詞等）。example_en 要自然實用、包含該單字。",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        624,
+        0
+      ],
+      "id": "f2eaae9a-8537-420b-9944-d998c12c08c2",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.8-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        192
+      ],
+      "id": "902e62e9-8c22-4619-8b52-be79030853e5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "PaywFftaoUrAn4lP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "組裝單字卡": {
+      "main": [
+        [
+          {
+            "node": "寫入 Data Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "單字卡網頁入口": {
+      "main": [
+        [
+          {
+            "node": "讀取單字",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "讀取單字": {
+      "main": [
+        [
+          {
+            "node": "組網頁 HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "組網頁 HTML": {
+      "main": [
+        [
+          {
+            "node": "回傳網頁",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "讀取已有單字": {
+      "main": [
+        [
+          {
+            "node": "批次種子",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "批次種子": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "讀取已有單字",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "組裝單字卡",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  },
+  "versionId": "7b63ae4d-20e6-49f8-ad92-61eb16383958",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "b624619ee2ab76efdb50ec3d9db6d5a7b48a29e6e8549c3b681a12eab9e24201"
+  },
+  "nodeGroups": [],
+  "id": "34o9dSA7KDPCcejE",
+  "tags": []
+}
